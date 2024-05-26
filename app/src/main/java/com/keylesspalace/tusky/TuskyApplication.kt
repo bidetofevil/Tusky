@@ -37,6 +37,7 @@ import dagger.hilt.android.HiltAndroidApp
 import de.c1710.filemojicompat_defaults.DefaultEmojiPackList
 import de.c1710.filemojicompat_ui.helpers.EmojiPackHelper
 import de.c1710.filemojicompat_ui.helpers.EmojiPreference
+import io.embrace.android.embracesdk.Embrace
 import java.security.Security
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
@@ -66,6 +67,7 @@ class TuskyApplication : Application(), Configuration.Provider {
 //                    .build())
 //        }
         super.onCreate()
+        Embrace.getInstance().start(this)
 
         Security.insertProviderAt(Conscrypt.newProvider(), 1)
 
