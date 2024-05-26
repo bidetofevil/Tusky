@@ -79,3 +79,8 @@
 
 # OpenTelemetry SDK warning
 -dontwarn com.google.auto.value.AutoValue
+
+-keep class androidx.compose.ui.platform.AndroidComposeView {
+    <fields>;
+    <methods>;
+}
