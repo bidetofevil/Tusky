@@ -53,7 +53,7 @@ truth = "1.4.3"
 turbine = "1.1.0"
 unified-push = "2.4.0"
 xmlwriter = "1.0.4"
-embrace-android-sdk = "6.9.0"
+embrace-android-sdk = "6.9.1"
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
