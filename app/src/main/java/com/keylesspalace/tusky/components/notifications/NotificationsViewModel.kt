@@ -31,6 +31,7 @@ import at.connyduck.calladapter.networkresult.fold
 import at.connyduck.calladapter.networkresult.map
 import at.connyduck.calladapter.networkresult.onFailure
 import com.keylesspalace.tusky.appstore.EventHub
+import com.keylesspalace.tusky.appstore.FilterUpdatedEvent
 import com.keylesspalace.tusky.appstore.PreferenceChangedEvent
 import com.keylesspalace.tusky.components.preference.PreferencesFragment.ReadingOrder
 import com.keylesspalace.tusky.components.timeline.Placeholder
@@ -125,6 +126,16 @@ class NotificationsViewModel @Inject constructor(
                 if (event is PreferenceChangedEvent) {
                     onPreferenceChanged(event.preferenceKey)
                 }
+                if (event is FilterUpdatedEvent && event.filterContext.contains(Filter.Kind.NOTIFICATIONS.kind)) {
+                    filterModel.init(Filter.Kind.NOTIFICATIONS)
+                    refreshTrigger.value += 1
+                }
+            }
+        }
+        viewModelScope.launch {
+            val needsRefresh = filterModel.init(Filter.Kind.NOTIFICATIONS)
+            if (needsRefresh) {
+                refreshTrigger.value++
             }
         }
     }
@@ -147,7 +158,7 @@ class NotificationsViewModel @Inject constructor(
 
     private fun shouldFilterStatus(notificationViewData: NotificationViewData): Filter.Action {
         return when ((notificationViewData as? NotificationViewData.Concrete)?.type) {
-            Notification.Type.MENTION, Notification.Type.STATUS, Notification.Type.POLL -> {
+            Notification.Type.MENTION, Notification.Type.POLL -> {
                 notificationViewData.statusViewData?.let { statusViewData ->
                     statusViewData.filterAction = filterModel.shouldFilterStatus(statusViewData.actionable)
                     return statusViewData.filterAction

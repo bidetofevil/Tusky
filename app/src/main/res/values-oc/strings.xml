@@ -149,7 +149,6 @@
     <string name="app_theme_auto">Alba automatica</string>
     <string name="pref_title_browser_settings">Navegador</string>
     <string name="pref_title_custom_tabs">Onglets personalizats de Chrome</string>
-    <string name="pref_title_hide_follow_button">Amagar lo boton de redaccion en desplaçament</string>
     <string name="pref_title_post_filter">Filtre de la cronologia</string>
     <string name="pref_title_post_tabs">Fil principal</string>
     <string name="pref_title_show_boosts">Mostrar los retuts</string>
@@ -705,4 +704,6 @@
     <string name="following_hashtag_success_format">Seguiment de l’etiqueta #%1$s</string>
     <string name="unfollowing_hashtag_success_format">Arrèst del seguiment de l’etiqueta #%1$s</string>
     <string name="pref_title_show_notifications_filter">Mostrar lo filtre de las notificacions</string>
+    <string name="url_copied">Url copiada</string>
+    <string name="confirmation_hashtag_copied">« %1$s » copiat</string>
 </resources>

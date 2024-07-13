@@ -17,6 +17,7 @@ package com.keylesspalace.tusky.components.instanceinfo
 
 import android.util.Log
 import at.connyduck.calladapter.networkresult.NetworkResult
+import at.connyduck.calladapter.networkresult.fold
 import at.connyduck.calladapter.networkresult.getOrElse
 import at.connyduck.calladapter.networkresult.getOrThrow
 import at.connyduck.calladapter.networkresult.map
@@ -65,9 +66,11 @@ class InstanceInfoRepository @Inject constructor(
         //  - caching default value (we want to rather re-fetch if it fails)
         if (instanceInfoCache[instanceName] == null) {
             externalScope.launch {
-                fetchAndPersistInstanceInfo().onSuccess { fetched ->
-                    instanceInfoCache[fetched.instance] = fetched.toInfoOrDefault()
-                }
+                fetchAndPersistInstanceInfo().fold({ fetched ->
+                    instanceInfoCache[instanceName] = fetched.toInfoOrDefault()
+                }, { e ->
+                    Log.w(TAG, "failed to precache instance info", e)
+                })
             }
         }
     }
@@ -106,6 +109,10 @@ class InstanceInfoRepository @Inject constructor(
                     dao.getInstanceInfo(instanceName)
                 }
         }.toInfoOrDefault()
+
+    suspend fun saveFilterV2Support(filterV2Supported: Boolean) = dao.setFilterV2Support(instanceName, filterV2Supported)
+
+    suspend fun isFilterV2Supported(): Boolean = dao.getFilterV2Support(instanceName)
 
     private suspend fun InstanceInfoRepository.fetchAndPersistInstanceInfo(): NetworkResult<InstanceInfoEntity> =
         fetchRemoteInstanceInfo()

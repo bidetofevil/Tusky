@@ -43,6 +43,7 @@ import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
+import androidx.annotation.AttrRes
 import androidx.annotation.ColorInt
 import androidx.annotation.StringRes
 import androidx.annotation.VisibleForTesting
@@ -61,6 +62,7 @@ import androidx.transition.TransitionManager
 import com.canhub.cropper.CropImage
 import com.canhub.cropper.CropImageContract
 import com.canhub.cropper.options
+import com.google.android.material.R as materialR
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetBehavior.BottomSheetCallback
 import com.google.android.material.color.MaterialColors
@@ -90,6 +92,7 @@ import com.keylesspalace.tusky.settings.PrefKeys
 import com.keylesspalace.tusky.settings.PrefKeys.APP_THEME
 import com.keylesspalace.tusky.util.MentionSpan
 import com.keylesspalace.tusky.util.PickMediaFiles
+import com.keylesspalace.tusky.util.defaultFinders
 import com.keylesspalace.tusky.util.getInitialLanguages
 import com.keylesspalace.tusky.util.getLocaleList
 import com.keylesspalace.tusky.util.getMediaSize
@@ -143,6 +146,9 @@ class ComposeActivity :
     private lateinit var activeAccount: AccountEntity
 
     private var photoUploadUri: Uri? = null
+
+    @VisibleForTesting
+    var highlightFinders = defaultFinders
 
     @VisibleForTesting
     var maximumTootCharacters = InstanceInfoRepository.DEFAULT_CHARACTER_LIMIT
@@ -468,9 +474,9 @@ class ComposeActivity :
         binding.composeEditField.setSelection(binding.composeEditField.length())
 
         val mentionColour = binding.composeEditField.linkTextColors.defaultColor
-        highlightSpans(binding.composeEditField.text, mentionColour)
+        binding.composeEditField.text.highlightSpans(mentionColour, highlightFinders)
         binding.composeEditField.doAfterTextChanged { editable ->
-            highlightSpans(editable!!, mentionColour)
+            editable!!.highlightSpans(mentionColour, highlightFinders)
             updateVisibleCharactersLeft()
             viewModel.updateContent(editable.toString())
         }
@@ -817,24 +823,26 @@ class ComposeActivity :
             binding.descriptionMissingWarningButton.hide()
         } else {
             binding.composeHideMediaButton.show()
-            @ColorInt val color = if (contentWarningShown) {
+            @AttrRes val color = if (contentWarningShown) {
                 binding.composeHideMediaButton.setImageResource(R.drawable.ic_hide_media_24dp)
                 binding.composeHideMediaButton.isClickable = false
-                getColor(R.color.transparent_tusky_blue)
+                materialR.attr.colorPrimary
             } else {
                 binding.composeHideMediaButton.isClickable = true
                 if (markMediaSensitive) {
                     binding.composeHideMediaButton.setImageResource(R.drawable.ic_hide_media_24dp)
-                    getColor(R.color.tusky_blue)
+                    materialR.attr.colorPrimary
                 } else {
                     binding.composeHideMediaButton.setImageResource(R.drawable.ic_eye_24dp)
-                    MaterialColors.getColor(
-                        binding.composeHideMediaButton,
-                        android.R.attr.textColorTertiary
-                    )
+                    android.R.attr.textColorTertiary
                 }
             }
-            binding.composeHideMediaButton.drawable.setTint(color)
+            binding.composeHideMediaButton.drawable.setTint(
+                MaterialColors.getColor(
+                    binding.composeHideMediaButton,
+                    color
+                )
+            )
 
             var oneMediaWithoutDescription = false
             for (media in viewModel.media.value) {
@@ -852,14 +860,15 @@ class ComposeActivity :
             // Can't reschedule a published status
             enableButton(binding.composeScheduleButton, clickable = false, colorActive = false)
         } else {
-            @ColorInt val color = if (binding.composeScheduleView.time == null) {
+            @ColorInt val color =
                 MaterialColors.getColor(
                     binding.composeScheduleButton,
-                    android.R.attr.textColorTertiary
+                    if (binding.composeScheduleView.time == null) {
+                        android.R.attr.textColorTertiary
+                    } else {
+                        materialR.attr.colorPrimary
+                    }
                 )
-            } else {
-                getColor(R.color.tusky_blue)
-            }
             binding.composeScheduleButton.drawable.setTint(color)
         }
     }
@@ -1238,22 +1247,24 @@ class ComposeActivity :
         TransitionManager.beginDelayedTransition(
             binding.composeContentWarningBar.parent as ViewGroup
         )
-        @ColorInt val color = if (show) {
+        @AttrRes val color = if (show) {
             binding.composeContentWarningBar.show()
             binding.composeContentWarningField.setSelection(
                 binding.composeContentWarningField.text.length
             )
             binding.composeContentWarningField.requestFocus()
-            getColor(R.color.tusky_blue)
+            materialR.attr.colorPrimary
         } else {
             binding.composeContentWarningBar.hide()
             binding.composeEditField.requestFocus()
-            MaterialColors.getColor(
-                binding.composeContentWarningButton,
-                android.R.attr.textColorTertiary
-            )
+            android.R.attr.textColorTertiary
         }
-        binding.composeContentWarningButton.drawable.setTint(color)
+        binding.composeContentWarningButton.drawable.setTint(
+            MaterialColors.getColor(
+                binding.composeHideMediaButton,
+                color
+            )
+        )
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {

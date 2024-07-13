@@ -136,6 +136,10 @@ class TuskyApplication : Application(), Configuration.Provider {
             editor.remove(PrefKeys.TAB_SHOW_HOME_SELF_BOOSTS)
         }
 
+        if (oldVersion < 2024060201) {
+            editor.remove(PrefKeys.Deprecated.FAB_HIDE)
+        }
+
         editor.putInt(PrefKeys.SCHEMA_VERSION, newVersion)
         editor.apply()
     }

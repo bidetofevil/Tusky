@@ -5,7 +5,7 @@
     android:layout_height="match_parent"
     android:background="?android:attr/colorBackground">
 
-    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+    <com.keylesspalace.tusky.view.TuskySwipeRefreshLayout
         android:id="@+id/swipeRefreshLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
@@ -16,6 +16,7 @@
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/recyclerView"
+                android:clipToPadding="false"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent" />
 
@@ -26,7 +27,7 @@
                 android:layout_marginBottom="?attr/actionBarSize"
                 android:visibility="gone" />
         </FrameLayout>
-    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+    </com.keylesspalace.tusky.view.TuskySwipeRefreshLayout>
 
     <ProgressBar
         android:id="@+id/progressBar"

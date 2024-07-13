@@ -49,6 +49,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.viewpager2.widget.MarginPageTransformer
 import com.bumptech.glide.Glide
+import com.google.android.material.R as materialR
 import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.chip.Chip
 import com.google.android.material.color.MaterialColors
@@ -129,8 +130,7 @@ class AccountActivity : BottomSheetActivity(), ActionButtonActivity, MenuProvide
     private var animateAvatar: Boolean = false
     private var animateEmojis: Boolean = false
 
-    // fields for scroll animation
-    private var hideFab: Boolean = false
+    // for scroll animation
     private var oldOffset: Int = 0
 
     @ColorInt
@@ -170,7 +170,6 @@ class AccountActivity : BottomSheetActivity(), ActionButtonActivity, MenuProvide
 
         animateAvatar = preferences.getBoolean(PrefKeys.ANIMATE_GIF_AVATARS, false)
         animateEmojis = preferences.getBoolean(PrefKeys.ANIMATE_CUSTOM_EMOJIS, false)
-        hideFab = preferences.getBoolean(PrefKeys.FAB_HIDE, false)
 
         handleWindowInsets()
         setupToolbar()
@@ -191,9 +190,9 @@ class AccountActivity : BottomSheetActivity(), ActionButtonActivity, MenuProvide
      * Load colors and dimensions from resources
      */
     private fun loadResources() {
-        toolbarColor = MaterialColors.getColor(this, com.google.android.material.R.attr.colorSurface, Color.BLACK)
+        toolbarColor = MaterialColors.getColor(this, materialR.attr.colorSurface, Color.BLACK)
         statusBarColorTransparent = getColor(R.color.transparent_statusbar_background)
-        statusBarColorOpaque = MaterialColors.getColor(this, androidx.appcompat.R.attr.colorPrimaryDark, Color.BLACK)
+        statusBarColorOpaque = MaterialColors.getColor(this, materialR.attr.colorPrimaryDark, Color.BLACK)
         avatarSize = resources.getDimension(R.dimen.account_activity_avatar_size)
         titleVisibleHeight = resources.getDimensionPixelSize(R.dimen.account_activity_scroll_title_visible_height)
     }
@@ -364,15 +363,6 @@ class AccountActivity : BottomSheetActivity(), ActionButtonActivity, MenuProvide
                     supportActionBar?.setDisplayShowTitleEnabled(false)
                 }
 
-                if (hideFab && !blocking) {
-                    if (verticalOffset > oldOffset) {
-                        binding.accountFloatingActionButton.show()
-                    }
-                    if (verticalOffset < oldOffset) {
-                        binding.accountFloatingActionButton.hide()
-                    }
-                }
-
                 val scaledAvatarSize = (avatarSize + verticalOffset) / avatarSize
 
                 binding.accountAvatarImageView.scaleX = scaledAvatarSize
@@ -469,7 +459,6 @@ class AccountActivity : BottomSheetActivity(), ActionButtonActivity, MenuProvide
                 binding.swipeToRefreshLayout.isRefreshing = isRefreshing == true
             }
         }
-        binding.swipeToRefreshLayout.setColorSchemeResources(R.color.tusky_blue)
     }
 
     private fun onAccountChanged(account: Account?) {
