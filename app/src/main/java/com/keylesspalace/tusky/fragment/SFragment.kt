@@ -28,7 +28,6 @@ import android.view.View
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.LayoutRes
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.PopupMenu
 import androidx.core.app.ActivityOptionsCompat
 import androidx.core.content.getSystemService
@@ -36,6 +35,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import at.connyduck.calladapter.networkresult.fold
 import at.connyduck.calladapter.networkresult.onFailure
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import com.keylesspalace.tusky.BaseActivity
 import com.keylesspalace.tusky.BottomSheetActivity
@@ -180,9 +180,10 @@ abstract class SFragment(@LayoutRes contentLayoutId: Int) : Fragment(contentLayo
 
     protected fun more(status: Status, view: View, position: Int, translation: Translation?) {
         val id = status.actionableId
-        val accountId = status.actionableStatus.account.id
-        val accountUsername = status.actionableStatus.account.username
-        val statusUrl = status.actionableStatus.url
+        val actionableStatus = status.actionableStatus
+        val accountId = actionableStatus.account.id
+        val accountUsername = actionableStatus.account.username
+        val statusUrl = actionableStatus.url
         var loggedInAccountId: String? = null
         val activeAccount = accountManager.activeAccount
         if (activeAccount != null) {
@@ -194,22 +195,21 @@ abstract class SFragment(@LayoutRes contentLayoutId: Int) : Fragment(contentLayo
         if (statusIsByCurrentUser) {
             popup.inflate(R.menu.status_more_for_user)
             val menu = popup.menu
-            when (status.visibility) {
+            when (actionableStatus.visibility) {
                 Status.Visibility.PUBLIC, Status.Visibility.UNLISTED -> {
                     menu.add(
                         0,
                         R.id.pin,
                         1,
                         getString(
-                            if (status.pinned) R.string.unpin_action else R.string.pin_action
+                            if (actionableStatus.pinned) R.string.unpin_action else R.string.pin_action
                         )
                     )
                 }
 
                 Status.Visibility.PRIVATE -> {
-                    val reblogged = status.reblog?.reblogged ?: status.reblogged
-                    menu.findItem(R.id.status_reblog_private).isVisible = !reblogged
-                    menu.findItem(R.id.status_unreblog_private).isVisible = reblogged
+                    menu.findItem(R.id.status_reblog_private).isVisible = !actionableStatus.reblogged
+                    menu.findItem(R.id.status_unreblog_private).isVisible = actionableStatus.reblogged
                 }
 
                 else -> {}
@@ -241,7 +241,7 @@ abstract class SFragment(@LayoutRes contentLayoutId: Int) : Fragment(contentLayo
             )
         }
 
-        // translation not there for your own posts, posts already in your language or non-public posts
+        // translation not there for posts already in your language or non-public posts
         menu.findItem(R.id.status_translate)?.let { translateItem ->
             translateItem.isVisible = onMoreTranslate != null &&
                 !status.language.equals(Locale.getDefault().language, ignoreCase = true) &&
@@ -298,7 +298,7 @@ abstract class SFragment(@LayoutRes contentLayoutId: Int) : Fragment(contentLayo
                 }
 
                 R.id.status_download_media -> {
-                    requestDownloadAllMedia(status)
+                    requestDownloadAllMedia(actionableStatus)
                     return@setOnMenuItemClickListener true
                 }
 
@@ -344,7 +344,7 @@ abstract class SFragment(@LayoutRes contentLayoutId: Int) : Fragment(contentLayo
 
                 R.id.pin -> {
                     viewLifecycleOwner.lifecycleScope.launch {
-                        timelineCases.pin(status.id, !status.pinned)
+                        timelineCases.pin(status.actionableId, !actionableStatus.pinned)
                             .onFailure { e: Throwable ->
                                 val message = e.message
                                     ?: getString(if (status.pinned) R.string.failed_to_unpin else R.string.failed_to_pin)
@@ -383,7 +383,7 @@ abstract class SFragment(@LayoutRes contentLayoutId: Int) : Fragment(contentLayo
     }
 
     private fun onBlock(accountId: String, accountUsername: String) {
-        AlertDialog.Builder(requireContext())
+        MaterialAlertDialogBuilder(requireContext())
             .setMessage(getString(R.string.dialog_block_warning, accountUsername))
             .setPositiveButton(android.R.string.ok) { _: DialogInterface?, _: Int ->
                 lifecycleScope.launch {
@@ -428,7 +428,7 @@ abstract class SFragment(@LayoutRes contentLayoutId: Int) : Fragment(contentLayo
     }
 
     private fun showConfirmDeleteDialog(id: String, position: Int) {
-        AlertDialog.Builder(requireActivity())
+        MaterialAlertDialogBuilder(requireActivity())
             .setMessage(R.string.dialog_delete_post_warning)
             .setPositiveButton(android.R.string.ok) { _: DialogInterface?, _: Int ->
                 viewLifecycleOwner.lifecycleScope.launch {
@@ -452,7 +452,7 @@ abstract class SFragment(@LayoutRes contentLayoutId: Int) : Fragment(contentLayo
     private fun showConfirmEditDialog(id: String, position: Int, status: Status) {
         val context = context ?: return
 
-        AlertDialog.Builder(context)
+        MaterialAlertDialogBuilder(context)
             .setMessage(R.string.dialog_redraft_post_warning)
             .setPositiveButton(android.R.string.ok) { _: DialogInterface?, _: Int ->
                 viewLifecycleOwner.lifecycleScope.launch {

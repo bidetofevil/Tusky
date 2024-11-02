@@ -27,7 +27,6 @@ import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.ListView
 import android.widget.PopupWindow
-import androidx.appcompat.app.AlertDialog
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.view.MenuProvider
 import androidx.fragment.app.viewModels
@@ -43,6 +42,7 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import at.connyduck.calladapter.networkresult.onFailure
 import at.connyduck.sparkbutton.helpers.Utils
 import com.google.android.material.appbar.AppBarLayout
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import com.keylesspalace.tusky.R
 import com.keylesspalace.tusky.adapter.StatusBaseViewHolder
@@ -218,6 +218,7 @@ class NotificationsFragment :
                             )
                         }
                     }
+                    loadMorePosition = null
                 }
                 if (readingOrder == ReadingOrder.OLDEST_FIRST) {
                     updateReadingPositionForOldestFirst(adapter)
@@ -415,7 +416,7 @@ class NotificationsFragment :
     }
 
     private fun confirmClearNotifications() {
-        AlertDialog.Builder(requireContext())
+        MaterialAlertDialogBuilder(requireContext())
             .setMessage(R.string.notification_clear_text)
             .setPositiveButton(android.R.string.ok) { _: DialogInterface?, _: Int -> clearNotifications() }
             .setNegativeButton(android.R.string.cancel, null)
@@ -432,7 +433,7 @@ class NotificationsFragment :
         }
 
         val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_list_item_multiple_choice, notificationTypeList)
-        val window = PopupWindow(requireContext())
+        val window = PopupWindow(requireContext(), null, com.google.android.material.R.attr.listPopupWindowStyle)
         val menuBinding = NotificationsFilterBinding.inflate(LayoutInflater.from(requireContext()), binding.root as ViewGroup, false)
 
         menuBinding.buttonApply.setOnClickListener {

@@ -186,9 +186,9 @@
     <string name="pref_title_http_proxy_enable">Abilita proxy HTTP</string>
     <string name="pref_title_http_proxy_server">Server proxy HTTP</string>
     <string name="pref_title_http_proxy_port">Porta proxy HTTP</string>
-    <string name="pref_default_post_privacy">Privacy predefinita dei post (sincronizzato sul server)</string>
+    <string name="pref_default_post_privacy">Privacy dei post (sincronizzato sul server)</string>
     <string name="pref_default_media_sensitivity">Segna sempre media come sensibili (sincronizzato sul server)</string>
-    <string name="pref_publishing">Pubblicazione</string>
+    <string name="pref_publishing">Predefiniti di pubblicazione</string>
     <string name="pref_failed_to_sync">Sincronizzazione preferenze fallita</string>
     <string name="post_privacy_public">Pubblico</string>
     <string name="post_privacy_unlisted">Non in elenco</string>
@@ -252,7 +252,7 @@
     <string name="pref_title_alway_show_sensitive_media">Mostra sempre i contenuti sensibili</string>
     <string name="title_media">Media</string>
     <string name="replying_to">Rispondendo a @%1$s</string>
-    <string name="load_more_placeholder_text">carica altro</string>
+    <string name="load_more_placeholder_text">Carica altro</string>
     <string name="pref_title_public_filter_keywords">Timeline pubbliche</string>
     <string name="pref_title_thread_filter_keywords">Conversazioni</string>
     <string name="filter_addition_title">Aggiungi filtro</string>
@@ -267,9 +267,9 @@
     <string name="error_create_list">Non è stato possibile creare la lista</string>
     <string name="error_rename_list">Non è stato possibile aggiornare la lista</string>
     <string name="error_delete_list">Non è stato possibile eliminare la lista</string>
-    <string name="action_create_list">Crea una lista</string>
-    <string name="action_rename_list">Aggiorna la lista</string>
-    <string name="action_delete_list">Elimina la lista</string>
+    <string name="action_create_list">Crea lista</string>
+    <string name="action_rename_list">Aggiorna lista</string>
+    <string name="action_delete_list">Elimina lista</string>
     <string name="hint_search_people_list">Cerca tra le persone che segui</string>
     <string name="action_add_to_list">Aggiungi un account alla lista</string>
     <string name="action_remove_from_list">Rimuovi un account dalla lista</string>
@@ -568,7 +568,7 @@
     <string name="hint_media_description_missing">I media dovrebbero avere una descrizione.</string>
     <string name="no_lists">Non hai alcuna lista.</string>
     <string name="language_display_name_format">%1$s (%2$s)</string>
-    <string name="pref_default_post_language">Lingua predefinita per i post creati (sincronizzato sul server)</string>
+    <string name="pref_default_post_language">Lingua per i post creati (sincronizzato sul server)</string>
     <string name="notification_report_description">Notifiche sulle segnalazioni da moderare</string>
     <string name="failed_to_unpin">Rimozione del fissaggio fallita</string>
     <string name="pref_title_http_proxy_port_message">Il port dovrebbe essere tra %1$d e %2$d</string>
@@ -731,8 +731,12 @@
     <string name="unknown_notification_type">Tipo di notifica sconosciuto</string>
     <string name="url_copied">URL copiato</string>
     <string name="confirmation_hashtag_copied">\'#%1$s\' copiato</string>
-    <string name="pref_default_reply_privacy">Privacy predefinita della risposta (non sincronizzato sul server)</string>
+    <string name="pref_default_reply_privacy">Privacy della risposta (non sincronizzato sul server)</string>
     <string name="error_deleting_filter">Errore nella cancellazione del filtro \'%1$s\'</string>
     <string name="error_saving_filter">Errore nel salvataggio del filtro \'%1$s\'</string>
     <string name="action_follow_hashtag">Segui un nuovo hashtag</string>
+    <string name="pref_default_reply_privacy_explanation">La privacy preselezionata dipenderà dal post a cui stai rispondendo.</string>
+    <string name="pref_match_default_post_privacy">Stessa privacy predefinita del post</string>
+    <string name="post_privacy_direct">Diretto</string>
+    <string name="label_expires_after">Scade dopo</string>
 </resources>

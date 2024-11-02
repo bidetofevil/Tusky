@@ -331,13 +331,6 @@ class ComposeViewModel @Inject constructor(
         mediaUploader.cancelUploadScope(*_media.value.map { it.localId }.toIntArray())
     }
 
-    fun shouldShowSaveDraftDialog(): Boolean {
-        // if any of the media files need to be downloaded first it could take a while, so show a loading dialog
-        return _media.value.any { mediaValue ->
-            mediaValue.uri.scheme == "https"
-        }
-    }
-
     suspend fun saveDraft(content: String, contentWarning: String) {
         val mediaUris: MutableList<String> = mutableListOf()
         val mediaDescriptions: MutableList<String?> = mutableListOf()
@@ -390,7 +383,7 @@ class ComposeViewModel @Inject constructor(
         val tootToSend = StatusToSend(
             text = content,
             warningText = spoilerText,
-            visibility = _statusVisibility.value.serverString,
+            visibility = _statusVisibility.value.stringValue,
             sensitive = attachedMedia.isNotEmpty() && (_markMediaAsSensitive.value || _showContentWarning.value),
             media = attachedMedia,
             scheduledAt = _scheduledAt.value,
@@ -487,12 +480,15 @@ class ComposeViewModel @Inject constructor(
         inReplyToId = composeOptions?.inReplyToId
 
         val activeAccount = accountManager.activeAccount!!
-        val preferredVisibility =
-            if (inReplyToId != null) activeAccount.defaultReplyPrivacy else activeAccount.defaultPostPrivacy
+        val preferredVisibility = if (inReplyToId != null) {
+            activeAccount.defaultReplyPrivacy.toVisibilityOr(activeAccount.defaultPostPrivacy)
+        } else {
+            activeAccount.defaultPostPrivacy
+        }
 
         val replyVisibility = composeOptions?.replyVisibility ?: Status.Visibility.UNKNOWN
-        startingVisibility = Status.Visibility.byNum(
-            preferredVisibility.num.coerceAtLeast(replyVisibility.num)
+        startingVisibility = Status.Visibility.fromInt(
+            preferredVisibility.int.coerceAtLeast(replyVisibility.int)
         )
 
         modifiedInitialState = composeOptions?.modifiedInitialState == true
@@ -534,7 +530,7 @@ class ComposeViewModel @Inject constructor(
         postLanguage = composeOptions?.language
 
         val tootVisibility = composeOptions?.visibility ?: Status.Visibility.UNKNOWN
-        if (tootVisibility.num != Status.Visibility.UNKNOWN.num) {
+        if (tootVisibility.int != Status.Visibility.UNKNOWN.int) {
             startingVisibility = tootVisibility
         }
         _statusVisibility.value = startingVisibility

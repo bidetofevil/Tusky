@@ -22,9 +22,11 @@ import android.os.Bundle
 import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
+import android.view.MotionEvent
 import androidx.activity.viewModels
 import androidx.appcompat.widget.SearchView
 import androidx.core.view.MenuProvider
+import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import com.keylesspalace.tusky.BottomSheetActivity
 import com.keylesspalace.tusky.R
@@ -41,6 +43,8 @@ class SearchActivity : BottomSheetActivity(), MenuProvider, SearchView.OnQueryTe
     private val viewModel: SearchViewModel by viewModels()
 
     private val binding by viewBinding(ActivitySearchBinding::inflate)
+
+    private lateinit var searchView: SearchView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -78,8 +82,9 @@ class SearchActivity : BottomSheetActivity(), MenuProvider, SearchView.OnQueryTe
         menuInflater.inflate(R.menu.search_toolbar, menu)
         val searchViewMenuItem = menu.findItem(R.id.action_search)
         searchViewMenuItem.expandActionView()
-        val searchView = searchViewMenuItem.actionView as SearchView
-        setupSearchView(searchView)
+        searchView = searchViewMenuItem.actionView as SearchView
+        setupSearchView()
+        setupClearFocusOnClickListeners()
     }
 
     override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
@@ -99,10 +104,35 @@ class SearchActivity : BottomSheetActivity(), MenuProvider, SearchView.OnQueryTe
         if (Intent.ACTION_SEARCH == intent.action) {
             viewModel.currentQuery = intent.getStringExtra(SearchManager.QUERY).orEmpty()
             viewModel.search(viewModel.currentQuery)
+            searchView.clearFocus()
         }
     }
 
-    private fun setupSearchView(searchView: SearchView) {
+    private fun setupClearFocusOnClickListeners() {
+        binding.overlayPagesClickView.setOnTouchListener { view, event ->
+            if (event.action == MotionEvent.ACTION_DOWN) {
+                searchView.clearFocus()
+                view.performClick()
+            }
+            false
+        }
+        binding.toolbar.setOnClickListener {
+            searchView.clearFocus()
+        }
+        binding.tabs.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
+            override fun onTabSelected(p0: TabLayout.Tab?) {
+                searchView.clearFocus()
+            }
+
+            override fun onTabUnselected(p0: TabLayout.Tab?) {}
+
+            override fun onTabReselected(p0: TabLayout.Tab?) {
+                searchView.clearFocus()
+            }
+        })
+    }
+
+    private fun setupSearchView() {
         searchView.setIconifiedByDefault(false)
         searchView.setSearchableInfo(
             (
@@ -143,7 +173,7 @@ class SearchActivity : BottomSheetActivity(), MenuProvider, SearchView.OnQueryTe
         searchView.setOnQueryTextListener(this)
         searchView.setQuery(viewModel.currentSearchFieldContent ?: "", false)
 
-        searchView.requestFocus()
+        if (viewModel.currentSearchFieldContent == "") searchView.requestFocus()
     }
 
     override fun onQueryTextSubmit(query: String?): Boolean {
